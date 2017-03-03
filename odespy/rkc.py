@@ -1,6 +1,6 @@
 """Module for wrapping rkc.f."""
-
-from solvers import Solver, Adaptive
+from __future__ import absolute_import, print_function
+from . solvers import Solver, Adaptive
 import numpy as np
 
 # f_f77 and other items are defined in odepack.py and will
@@ -31,7 +31,7 @@ This subroutine should be defined in form:
         type=callable),
     )
 
-import solvers
+from . import solvers
 solvers._parameters.update(_parameters_RKC)
 
 class RKC(Adaptive):
@@ -105,9 +105,9 @@ class RKC(Adaptive):
         atol = self.atol
         if not isinstance(atol,float):
             if len(atol) not in (1, self.neq):
-                raise ValueError,  '''
+                raise ValueError('''
 ATOL =%s should be either a scalar or a vector of length NEQ=%d.
-           ''' % (str(atol), self.neq)
+           ''' % (str(atol), self.neq))
 
     def validate_data(self):
         self.check_atol()

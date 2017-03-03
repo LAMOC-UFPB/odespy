@@ -1,5 +1,5 @@
 # Authors: Liwei Wang, Hans Petter Langtangen
-
+from __future__ import absolute_import, print_function
 '''
 This module contains the base class ``Solver``
 package and the implementations of many subclasses.
@@ -477,7 +477,7 @@ def _format_parameters_table(parameter_names, fixed_width=None):
 
     if fixed_width is None:
         max_name_length = max([len(name) \
-                               for name in parameter_names + ['Name']])
+                               for name in list(parameter_names) + ['Name']])
         c1 = max_name_length + 1     # width of column 1
         c2 = (max_line_width - c1)   # width of column 2
     else:
@@ -521,8 +521,8 @@ def table_of_parameters(classname):
     opt_prm = getattr(classname, '_optional_parameters')
     for name in opt_prm:
         if not name in _parameters:
-            print 'Parameter "%s" used in class %s is not registered in _parameters.' % (name, classname.__name__)
-            print 'Do that before proceeding.'
+            print('Parameter "%s" used in class %s is not registered in _parameters.' % (name, classname.__name__))
+            print('Do that before proceeding.')
             sys.exit(1)
 
     s = """
@@ -696,10 +696,9 @@ class Solver:
                     else:
                         kwargs[func] = getattr(_callback,func)
             except:
-                raise ValueError, '''
-           F2py failed to compile input string (=\n%s)
-           to be callable functions (%s).''' \
-                 % (string_to_compile, str_funcs.keys())
+                raise ValueError('''
+        F2py failed to compile input string (=\n%s)
+        to be callable functions (%s).''' % (string_to_compile, str_funcs.keys()))
         return f, kwargs
 
     def adjust_parameters(self):
@@ -859,13 +858,13 @@ class Solver:
         for name, check_funcs, value in prm_type_list:
             try:
                 if not check_funcs(value):  # Return false
-                    raise ValueError,'''
+                    raise ValueError('''
         Improper value (=%s) for parameter %s.
-        Please check your input.''' % (str(value), name)
+        Please check your input.''' % (str(value), name))
             except:     # cannot run check_function smoothly
-                raise ValueError,'''
+                raise ValueError('''
         Cannot run check function for %s=%s.
-        Please check your input.''' % (name, str(value))
+        Please check your input.''' % (name, str(value)))
         return True
 
     def get(self, parameter_name=None, print_info=False):
@@ -889,14 +888,14 @@ class Solver:
                 all_args['name of jac'] = self.users_jac.func_name
 
             if print_info:
-                print pprint.pformat(all_args)
+                print(pprint.pformat(all_args))
             return all_args
 
         else:
             if hasattr(self, parameter_name):
                 value = getattr(self, parameter_name)
                 if print_info:
-                    print "%s = %s" % (parameter_name, value)
+                    print("%s = %s" % (parameter_name, value))
                 return value
             else:
                 raise AttributeError('Parameter %s is not set' % parameter_name)
@@ -907,12 +906,12 @@ class Solver:
         legal parameters in current subclass (i.e., the parameters
         in ``self._parameters``).
 
-        If *print_info* is *True*, the ``self._parameters`` dict
+        If *print_info* is *True*, the ``self._parameters`` dict)
         is pretty printed, otherwise it is returned.
         '''
         if print_info:
-            print 'Legal parameters for class %s are:' % self.__class__.__name__
-            print pprint.pformat(self._parameters)
+            print('Legal parameters for class %s are:' % self.__class__.__name__)
+            print(pprint.pformat(self._parameters))
             return None
         else:
             return self._parameters
@@ -931,11 +930,11 @@ class Solver:
         if with_f and hasattr(self, 'users_f'):
             if not hasattr(self.users_f, '__name__'):     # class instance?
                 f_name = self.users_f.__class__.__name__
-	    else:    # Ordinary functions
-                f_name = self.users_f.__name__
-	        if f_name == '<lambda>':   # lambda function
-	  	    f_name = 'lambda u, t: ...'
-            args.append('f=%s' % f_name)
+        else:    # Ordinary functions
+            f_name = self.users_f.__name__
+            if f_name == '<lambda>':   # lambda function
+                f_name = 'lambda u, t: ...'
+        args.append('f=%s' % f_name)
 
         # form all parameters
         for name in self._parameters:
@@ -960,13 +959,12 @@ class Solver:
         if hasattr(self, 'users_jac'):
             if hasattr(self.users_jac, '__name__'):     # plain function?
                 f_name = self.users_jac.__name__
-	        if f_name == '<lambda>':   # lambda function
-	  	    #f_name = 'lambda u, t: ...'
-	  	    f_name = 'lambda'
-	    else:                                       # class instance
+            if f_name == '<lambda>':   # lambda function
+                # f_name = 'lambda u, t: ...'
+                f_name = 'lambda'
+            else:   # class instance
                 f_name = self.users_jac.__class__.__name__
             args.append('jac=%s' % f_name)
-
 
         args = ', '.join(args)
         if args:
@@ -1045,11 +1043,11 @@ class Solver:
             self.u[n+1] = self.advance()   # new value
 
             if self.verbose > 2:
-                print '%s, step %d, t=%g' % \
-                      (self.__class__.__name__, n+1, self.t[n+1])
+                print('%s, step %d, t=%g' %
+                      (self.__class__.__name__, n+1, self.t[n+1]))
             if terminate(self.u, self.t, n+1):
-                print self.__class__.__name__, \
-                      'terminated at t=%g' % self.t[n+1]
+                print(self.__class__.__name__,
+                      'terminated at t=%g' % self.t[n+1])
                 if not self.disk_storage:
                     self.u, self.t = self.u[:n+2], self.t[:n+2]
                 # else: must keep original size of file, rest is 0
@@ -1084,7 +1082,7 @@ class Solver:
             if len(self.t) < 2:
                 raise ValueError('time_points array %s must have at least two elements' % repr(self.t))
             if self.verbose > 0:
-                print 'Calling f(U0, %g) to determine data type' % self.t[0]
+                print('Calling f(U0, %g) to determine data type' % self.t[0])
             value = np.array(self.f(self.U0, self.t[0]))
         else:
             value = np.asarray(self.U0)
@@ -1161,23 +1159,23 @@ class Solver:
             or (not np.asarray(
             # all items in self.t should be numbers
             [isinstance(t, (int,float)) for t in self.t]).all()):
-                raise TypeError, \
-                    'solve: time_points(=%s) is not a proper '\
-                    'sequence of real numbers' % str(self.t)
+                raise TypeError(
+                    'solve: time_points(=%s) is not a proper '
+                    'sequence of real numbers' % str(self.t))
 
         # self.t should be supplied in an asscending/descending order
         t_sorted = sorted(self.t, reverse=self.t[0] > self.t[-1])
         if list(self.t) != list(t_sorted):
-            raise ValueError, \
-                'time_points(=%s) is not provided in an ascending/descending'\
-                ' order!' % str(self.t)
+            raise ValueError(
+                'time_points(=%s) is not provided in an ascending/descending'
+                ' order!' % str(self.t))
 
         # Test whether all required parameters are provided
         for arg in self._required_parameters:
             if not hasattr(self, arg):
-                raise ValueError,\
-                    '"%s" has to be input as required parameter(s) for '\
-                    'solver %s.' % (arg,self.__class__.__name__)
+                raise ValueError(
+                    '"%s" has to be input as required parameter(s) for '
+                    'solver %s.' % (arg,self.__class__.__name__))
         return True
 
     def switch_to(self, solver_target, print_info=False, **kwargs):
@@ -1200,11 +1198,11 @@ class Solver:
         >>> m1 = odespy.RK2(f)
         >>> m1.set_initial_condition(1.)
         >>> u1, t = m1.solve(time_points)
-        >>> print 'Normarized error with RK2 is %g' % np.linalg.norm(u1 - exact_u)
+        >>> print('Normarized error with RK2 is %g' % np.linalg.norm(u1 - exact_u))
         Normarized error with RK2 is 0.0077317
         >>> m2 = m1.switch_to(odespy.RKFehlberg, rtol=1e-18)
         >>> u2, t = m2.solve(time_points)
-        >>> print 'Normarized error with RKFehlberg is %g' % np.linalg.norm(u2 - exact_u)
+        >>> print('Normarized error with RKFehlberg is %g' % np.linalg.norm(u2 - exact_u))
         Normarized error with RKFehlberg is 8.55517e-08
         """
         # Extract name list of all the subclasses in this module
@@ -1220,10 +1218,10 @@ class Solver:
                 # Convert string to class name
                 solver_target = getattr(odespy, solver_target)
         except:
-            raise ValueError, error_message
+            raise ValueError(error_message)
 
         if not solver_target.__name__ in list_all_solvers():
-            raise ValueError, error_message
+            raise ValueError(error_message)
 
 
 
@@ -1266,9 +1264,9 @@ class Solver:
             diff_args = set(self.__dict__.keys()) - set(new.__dict__.keys()) \
                 - set(('u','t','n','dtype'))
             if diff_args:
-                print 'These attributes are neglected in %s: %s\n' \
-                    % (solver_target.__name__, str(diff_args)[5:-2])
-            print 'Switched to solver %s' % str(solver_target.__name__)
+                print('These attributes are neglected in %s: %s\n' \
+                    % (solver_target.__name__, str(diff_args)[5:-2]))
+            print('Switched to solver %s' % str(solver_target.__name__))
 
         return new
 
@@ -1329,14 +1327,14 @@ class Solver:
                         # Either 'jac' or 'jac_f77' should be supplied
                         found = bool([p_name for p_name in arg \
                                           if hasattr(self,p_name)])
-                        arg_print = 'One of %s' % str(arg)
+                        arg_print= 'One of %s' % str(arg)
                     else:      # arg is a single parameter
                         found = hasattr(self, arg)
-                        arg_print = arg
+                        arg_print= arg
                     if not found:
-                        raise ValueError,'''\
+                        raise ValueError('''\
         Error! Unsufficient input!
-        %s must be set when %s is %s!''' % (arg_print,name,value)
+        %s must be set when %s is %s!''' % (arg_print,name,value))
         return True
 
     def has_u_t_all(self):
@@ -1507,7 +1505,7 @@ class RK2(Solver):
         dt = t[n+1] - t[n]
         K1 = dt*f(u[n], t[n])
         K2 = dt*f(u[n] + 0.5*K1, t[n] + 0.5*dt)
-	u_new = u[n] + K2
+        u_new = u[n] + K2
         return u_new
 
 
@@ -1587,7 +1585,7 @@ class AdamsBashforth2(Solver):
     def validate_data(self):
         """Check that the time steps are constant."""
         if not self.constant_time_step():
-            print '%s must have constant time step' % self.__name__
+            print('%s must have constant time step' % self.__name__)
             return False
         else:
             return True
@@ -1636,7 +1634,7 @@ class AdamsBashforth3(Solver):
 
     def validate_data(self):
         if not self.constant_time_step():
-            print '%s must have constant time step' % self.__name__
+            print('%s must have constant time step' % self.__name__)
             return False
         else:
             return True
@@ -1689,7 +1687,7 @@ class AdamsBashMoulton2(Solver):
 
     def validate_data(self):
         if not self.constant_time_step():
-            print '%s must have constant time step' % self.__name__
+            print('%s must have constant time step' % self.__name__)
             return False
         else:
             return True
@@ -1743,7 +1741,7 @@ class AdamsBashforth4(Solver):
 
     def validate_data(self):
         if not self.constant_time_step():
-            print '%s must have constant time step' % self.__name__
+            print('%s must have constant time step' % self.__name__)
             return False
         else:
             return True
@@ -1800,7 +1798,7 @@ class AdamsBashMoulton3(Solver):
 
     def validate_data(self):
         if not self.constant_time_step():
-            print '%s must have constant time step' % self.__name__
+            print('%s must have constant time step' % self.__name__)
             return False
         else:
             return True
@@ -2013,7 +2011,7 @@ class odefun_sympy(Solver):
             import sympy
             self.sympy = sympy
         except ImportError:
-            raise ImportError,'sympy is not installed - needed for sympy_odefun'
+            raise ImportError('sympy is not installed - needed for sympy_odefun')
 
     def initialize_for_solve(self):
         # sympy.odefun requires f(t, u), not f(u, t, *args, **kwargs)
@@ -2119,8 +2117,8 @@ class SolverImplicit(Solver):
         u_new = un + (t_new-tn)*f(un,tn)
         # control by number of intern steps and error tolerance
         if self.verbose > 1:
-            print '%s.advance w/%s: t=%g, n=%d: ' % \
-                  (self.__class__.__name__, self.nonlinear_solver, t_new, n+1),
+            print('%s.advance w/%s: t=%g, n=%d: ' % \
+                  (self.__class__.__name__, self.nonlinear_solver, t_new, n+1)),
 
         while i <= self.max_iter and error > self.eps_iter:
             if self.nonlinear_solver == 'Linear':
@@ -2140,11 +2138,11 @@ class SolverImplicit(Solver):
             r = self.relaxation    # relaxation factor
             u_new = r*u_new_ + (1-r)*un
             if self.verbose > 2:
-                print '    u_%02d=%g (err=%g)' % (i, u_new, error)
+                print('    u_%02d=%g (err=%g)' % (i, u_new, error))
             i += 1
         self.num_iterations_total += i-1
         if self.verbose > 1:
-            print ' u=%g in %d iterations' % (u_new, i-1)
+            print(' u=%g in %d iterations' % (u_new, i-1))
         if error > self.eps_iter:
             raise ValueError('%s w/%s not converged:\n   difference in solution between last two iterations: %g > eps_iter=%g after %s iterations.' % (self.__class__.__name__, self.nonlinear_solver, error, self.eps_iter, self.max_iter))
         return u_new
@@ -2407,13 +2405,13 @@ class AdaptiveResidual(Adaptive):
                 time_points = np.linspace(t[k-1], t[k], ntpoints+1)
                 dt = time_points[1] - time_points[0]
                 if self.verbose > 0:
-                    print 'dt=%g, ' % dt,
+                    print('dt=%g, ' % dt,)
                 if dt < self.min_step and self.verbose > 0:
-                    print 'too small %s < %s, ' % (dt, self.min_step)
-                    print
+                    print('too small %s < %s, ' % (dt, self.min_step))
+                    print()
                     break
                 if dt > self.max_step and self.verbose > 0:
-                    print 'too large %s > %s, ' % (dt, self.max_step)
+                    print('too large %s > %s, ' % (dt, self.max_step))
                     break
 
                 self.solver.set_initial_condition(self.u[-1])
@@ -2421,10 +2419,10 @@ class AdaptiveResidual(Adaptive):
                 #R = self.residual(u_new[-2], u_new[-1], t_new[-2], t_new[-1])
                 R = self.residual(u_new[0], u_new[-1], t_new[0], t_new[-1])
                 if self.verbose > 0:
-                    print '\n%d time points in (t[%d], t[%d]) = (%.3g, %.3g), ' \
-                        % (ntpoints+1, k-1, k, t[k-1], t[k])
-                    print 'Residual=%.1E, tolerance=%.1E, calling %s' % \
-                        (R, self.atol, self.solver.__class__.__name__)
+                    print('\n%d time points in (t[%d], t[%d]) = (%.3g, %.3g), '
+                        % (ntpoints+1, k-1, k, t[k-1], t[k]))
+                    print('Residual=%.1E, tolerance=%.1E, calling %s' % \
+                        (R, self.atol, self.solver.__class__.__name__))
                 # reintegrate with time_step = dt/2
                 ntpoints *= 2
             self.u.extend(u_new[1:])
@@ -2511,8 +2509,8 @@ class RK34(Adaptive):
         self.h = first_step
 
         if self.verbose:
-            print '\nadvance solution in [%g, %g], ' % (t, t_np1),
-            print 'starting with h=%g' % self.h
+            print('\nadvance solution in [%g, %g], ' % (t, t_np1),)
+            print('starting with h=%g' % self.h)
 
         while t < t_np1:
 
@@ -2521,7 +2519,7 @@ class RK34(Adaptive):
                 u_new, error = self.advance_intermediate(u, t, self.h)
 
                 if self.verbose:
-                    print 'u(t=%g): %g, ' % (t + self.h, u_new),
+                    print('u(t=%g): %g, ' % (t + self.h, u_new),)
 
                 # Is u_new sufficiently accurate?
                 u_new_norm = np.linalg.norm(u_new)
@@ -2537,24 +2535,24 @@ class RK34(Adaptive):
 
                 if self.verbose:
                     if sufficiently_accurate:
-                        print 'accepted, ',
+                        print('accepted, ',)
                     else:
-                        print 'rejected, ',
-                    print ' err=%g (tol=%.1E), ' % (error, tol),
+                        print('rejected, ',)
+                    print(' err=%g (tol=%.1E), ' % (error, tol),)
                     if hasattr(self, 'u_exact'):
-                        print 'exact-err: %g, ' % \
-                              (np.abs(np.asarray(self.u_exact(t))-u)),
+                        print('exact-err: %g, ' %
+                              (np.abs(np.asarray(self.u_exact(t))-u))),
 
                 # Adjust time step
                 if error > 1E-14:
                     h_new = self.h*(tol/error)**(1./self.order)
-                    print 'changing time step', h_new, min_step, max_step
+                    print('changing time step', h_new, min_step, max_step)
                     self.h = middle(min_step, h_new, max_step)
 
                 self.h = min(self.h, t_np1-t)  # fit last step
 
                 if self.verbose:
-                    print 'new h=%g' % self.h
+                    print('new h=%g' % self.h)
         return u
 
 
@@ -2727,7 +2725,7 @@ class ode_scipy(Adaptive):
         u, f, n, t = self.u, self.f, self.n, self.t
         u_new = self.integrator.integrate(t[n+1])
         if not self.integrator.successful():
-            print 'Warning: %s call to ode.method.integrate in scipy.integrate was not successful' % self.__class__.__name__
+            print('Warning: %s call to ode.method.integrate in scipy.integrate was not successful' % self.__class__.__name__)
         if len(u_new) == 1:
             return u_new[0]
         else:
@@ -2908,7 +2906,12 @@ class odelab(Adaptive):
     solvers = 'ExplicitEuler ExplicitTrapezoidal ImplicitEuler RungeKutta34 RungeKutta4 SymplecticEuler ImplicitEuler LDIRK343 LobattoIIIA LobattoIIIB LobattoIIIC LobattoIIICs LobattoIIID MultiRKDAE RKDAE RadauIIA RungeKutta Spark Spark2 Spark3 Spark4 AdamsBashforth AdamsBashforth1 AdamsBashforth2 AdamsBashforth2e Butcher Butcher1 Butcher3 ExplicitGeneralLinear GeneralLinear Heun Kutta Kutta38 Kutta4 McLachlan NonHolonomicEnergy NonHolonomicEnergy0 NonHolonomicEnergyEMP NonHolonomicLeapFrog SymplecticEuler ABLawson ABLawson2 ABLawson3 ABLawson4 ABNorset4 Exponential GenLawson45 HochOst4 Lawson4 LawsonEuler Phi Polynomial RKMK4T'.split()
     DAE_solvers = 'SymplicticEuler MultiRKDAE RKDAE Spark Spark2 Spark3 Spark4'.split()
     not_valid = 'SymplecticEuler LDIRK343 LobattoIIIA LobattoIIIB LobattoIIIC LobattoIIICs LobattoIIID MultiRKDAE RKDAE RadauIIA RungeKutta Spark Spark2 Spark3 Spark4 AdamsBashforth AdamsBashforth2 AdamsBashforth2e Butcher Butcher1 Butcher3 ExplicitGeneralLinear GeneralLinear Kutta McLachlan NonHolonomicEnergy NonHolonomicEnergy0 NonHolonomicEnergyEMP NonHolonomicLeapFrog SymplecticEuler ABLawson ABLawson2 ABLawson3 ABLawson4 ABNorset4 Exponential GenLawson45 HochOst4 Lawson4 LawsonEuler Phi Polynomial RKMK4T'.split()
-    solvers = [solver for solver in solvers if not solver in not_valid]
+    # solvers = [solver for solver in solvers if not solver in not_valid]
+    solvers_tmp = []
+    for solver in solvers:
+        if solver not in not_valid:
+            solvers_tmp.append(solver)
+    solvers = solvers_tmp
 
     __doc__ = __doc__ % (str(solvers)[1:-1])
 
@@ -2943,7 +2946,7 @@ class odelab(Adaptive):
             self.odelab_schemes = schemes
 
         except ImportError:
-            raise ImportError,'The odelab software is not installed - needed for class odelab'
+            raise ImportError('The odelab software is not installed - needed for class odelab')
 
     def initialize_for_solve(self):
         # odelab requires f(t, u), not f(u, t, *args, **kwargs)
@@ -2979,7 +2982,7 @@ class odelab(Adaptive):
         since odelab. is such a solve method.
         """
         if terminate is not None:
-            print 'Warning: odelab.solve ignores the terminate function!'
+            print('Warning: odelab.solve ignores the terminate function!')
         self.t = np.asarray(time_points)
 
         try:
@@ -2992,11 +2995,11 @@ class odelab(Adaptive):
             self.solver.initialize(self.U0)
             # Solve problem in odelab
             self.solver.run(self.t[-1])
-        except Exception, e:
+        except Exception as e:
             msg = 'odelab scheme %s did not work:\n%s' % \
                   (self.odelab_solver, e)
-            #print msg
-            #print 'returning solution self.u as None'
+            #print(msg)
+            #print('returning solution self.u as None')
             #return None, self.t
             raise ValueError(msg)
 

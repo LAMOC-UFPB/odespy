@@ -1,4 +1,5 @@
-from solvers import Solver, Adaptive
+from __future__ import absolute_import, print_function
+from . solvers import Solver, Adaptive
 import numpy as np
 
 def _calculate_order_1_level(coefficients):
@@ -134,7 +135,7 @@ class RungeKutta2level(Adaptive):
         k = np.zeros((k_len, self.neq), self.dtype)  # intern stages
 
         if self.verbose > 0:
-            print 'advance solution in [%s, %s], h=%g' % (t_n, t_next, h)
+            print('advance solution in [%s, %s], h=%g' % (t_n, t_next, h))
 
         # Loop until next time point is reached
         while (abs(t - t_n) < abs(t_next - t_n)):
@@ -150,7 +151,7 @@ class RungeKutta2level(Adaptive):
 
             self.info['rejected'] += 1  # reduced below if accepted
             if self.verbose > 0:
-                print '  u(t=%g)=%g: ' % (t+h, u_new),
+                print('  u(t=%g)=%g: ' % (t+h, u_new)),
 
             # local error between 2 levels
             error = h*np.abs(np.dot(factors_error, k))
@@ -171,18 +172,18 @@ class RungeKutta2level(Adaptive):
                 self.info['rejected'] -= 1
 
                 if self.verbose > 0:
-                    print 'accepted, ',
+                    print('accepted, '),
             else:
                 if self.verbose > 0:
-                    print 'rejected, ',
+                    print('rejected, '),
 
             if self.verbose > 0:
-                print 'err=%s, ' % str(error),
+                print('err=%s, ' % str(error)),
                 if hasattr(self, 'u_exact') and callable(self.u_exact):
-                    print 'exact-err=%s, ' % \
-                          (np.asarray(self.u_exact(t+h))-u_new),
+                    print('exact-err=%s, ' %
+                          (np.asarray(self.u_exact(t+h))-u_new)),
                 if h <= self.min_step:
-                    print 'h=min_step!! ',
+                    print('h=min_step!! '),
 
 
            # Replace 0 values by 1e-16 since we will divide by error
@@ -209,7 +210,7 @@ class RungeKutta2level(Adaptive):
             h = min(h, t_next - t_intermediate[-1])
 
             if self.verbose > 0:
-                print 'new h=%g' % h
+                print('new h=%g' % h)
 
             if h == 0:
                 break
@@ -367,16 +368,16 @@ class MyRungeKutta(RungeKutta2level):
         # Check for dimension of user-defined butcher table.
         array_shape = self.butcher_tableau.shape
         if len(array_shape) is not 2:
-            raise ValueError,'''
-        Illegal input! Your input butcher_tableau should be a 2d-array!'''
+            raise ValueError('''
+        Illegal input! Your input butcher_tableau should be a 2d-array!''')
         else:
             m,n = array_shape
             if m not in (n, n + 1):
-                raise ValueError, '''\
+                raise ValueError('''\
         The dimension of 2d-array <method_yours_array> should be:
         1. Either (n, n), --> For 1-level RungeKutta methods
         2. Or (n+1, n),   --> For 2-levels RungeKutta methods
-        The shape of your input array is (%d, %d).''' % (m,n)
+        The shape of your input array is (%d, %d).''' % (m,n))
         self._butcher_tableau = self.butcher_tableau
 
         # Check for user-defined order,
@@ -393,19 +394,19 @@ class MyRungeKutta(RungeKutta2level):
             if array_shape[0] == array_shape[1] + 1:
                 # 2-level RungeKutta methods
                 if type(self.method_order) is int:
-                    raise ValueError, error_2level
+                    raise ValueError(error_2level)
                 try:
                     order1, order2 = self.method_order
                     if abs(order1-order2) != 1 or \
                             order1 < 1 or order2 < 1:
-                        raise ValueError, error_2level
+                        raise ValueError(error_2level)
                 except:
-                    raise ValueError,error_2level
+                    raise ValueError(error_2level)
             else:
                 # 1-level RungeKutta methods
                 if type(self.method_order) is not int or \
                         self.method_order < 1:
-                    raise ValueError,error_1level
+                    raise ValueError(error_1level)
             self._method_order = self.method_order
 
         else:   # method_order is not specified
@@ -418,7 +419,7 @@ class MyRungeKutta(RungeKutta2level):
         for i in range(1,array_shape[1] - 1):
             if not np.allclose(self.butcher_tableau[i][0],\
                                sum(self.butcher_tableau[i][1:])):
-                raise ValueError, '''
+                raise ValueError('''
         Inconsistent data in Butcher_Tableau!
         In each lines of stage-coefficients, first number should be
         equal to the sum of other numbers.
@@ -426,6 +427,6 @@ class MyRungeKutta(RungeKutta2level):
             a[i][0] == a[i][1] + a[i][2] + ... + a[i][K - 1]
             where 1 <= i <= K - 1
         Your input for line %d is :%s
-        ''' % (i,str(self.butcher_tableau[i]))
+        ''' % (i,str(self.butcher_tableau[i])))
 
         return True

@@ -1,9 +1,9 @@
-__author__ = ['Liwei Wang, Univ. of Oslo']
-
-from odespy import Solver
+from __future__ import absolute_import, print_function
+from . import Solver
 import numpy as np
 import sys
 
+__author__ = ['Liwei Wang, Univ. of Oslo']
 _parameters_Radau5 = dict(
 
     mas = dict(
@@ -80,7 +80,7 @@ defined as (note that rpar,ipar are not used)::
         type=callable),
 )
 
-import solvers
+from . import solvers
 solvers._parameters.update(_parameters_Radau5)
 
 
@@ -278,9 +278,9 @@ class Radau5(Solver):
                              *args, **self._extra_args_fortran)
 
         if idid < 0:          # Error occurred
-            print self._error_messages[idid] + str(t_new)
+            print(self._error_messages[idid] + str(t_new))
             sys.exit(1)   # Interrupt
-	return u_new
+        return u_new
 
 ### end of class Radau5 ###
 

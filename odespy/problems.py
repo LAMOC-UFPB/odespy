@@ -1,5 +1,7 @@
+from __future__ import absolute_import, print_function
 import numpy as np
-from solvers import compile_f77
+from . solvers import compile_f77
+
 
 class Problem:
     '''
@@ -282,7 +284,7 @@ class Gaussian0(Problem):
 def default_oscillator(P, resolution_per_period=20):
     n = 4.5
     r = resolution_per_period # short form
-    print 'default', P, n*P
+    print('default', P, n*P)
     tp = np.linspace(0, n*P, r*n+1)
     # atol=rtol since u approx 1, atol level set at the
     # error RK4 produces with 20 steps per period, times 0.05
@@ -519,7 +521,7 @@ def tester(problems, methods, time_points=None, compare_tol=1E-4,
     error_msg = {}
     for problem in problems:
         pname = problem.__class__.__name__
-        print 'problem ', pname
+        print('problem ', pname)
         methods4problem = [method for method in methods
                            if method not in problem.not_suitable_solvers]
         defaults = problem.default_parameters()
@@ -541,7 +543,7 @@ def tester(problems, methods, time_points=None, compare_tol=1E-4,
                 this_solver_prm[name] = defaults[name]
 
         for method in methods4problem:
-            print '  testing', method,
+            print('  testing', method)
             solver = eval('odespy.'+method)(problem.f)
 
             # Important to set parameters before setting initial cond.
@@ -554,12 +556,12 @@ def tester(problems, methods, time_points=None, compare_tol=1E-4,
             error = problem.verify(u, t)
             if error is not None:
                 results[pname][method] = (u, error)
-                print error,
+                print(error)
                 if error > compare_tol:
-                    print 'WARNING: tolerance %.0E exceeded' % compare_tol,
+                    print('WARNING: tolerance %.0E exceeded' % compare_tol)
             else:
                 results[pname][method] = (u,)
-            print
+            print()
     return results
 
 """
