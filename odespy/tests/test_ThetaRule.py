@@ -1,3 +1,4 @@
+from __future__ import absolute_import, print_function
 from numpy.testing import assert_array_almost_equal, TestCase, \
     run_module_suite, assert_almost_equal
 
@@ -64,9 +65,9 @@ class TestThetaRule(TestCase):
                              rtol=10*prms0['eps_iter'],
                              atol=prms0['eps_iter'])
             # str(solver) prints all parameters *different* from the defaults
-            print str(solver), 'works' if ok else 'does not work'
+            print(str(solver), 'works' if ok else 'does not work')
             if not ok:
-                print 'max deviation:', abs(u_d-u).max()
+                print('max deviation:', abs(u_d-u).max())
             assert ok
 
 if __name__ == "__main__":

@@ -43,5 +43,9 @@ odespy/radau5.py
     tab/space: 283
 
 odespy/problems.py
-   enable absolute imports , print function
-   print function
+    enable absolute imports , print function
+    print function
+
+odespy/tests/test_basic.py
+    enable absolute imports , print function
+    may places (example line 89, 90): the lambda syntax is invalid in PY3.6

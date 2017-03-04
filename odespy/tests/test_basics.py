@@ -13,7 +13,7 @@ future simulations with the recorded difference (check that these are
 within machine precision, here taken as 1E-14).
 """
 # Author: Liwei Wang and Hans Petter Langtangen
-
+from __future__ import absolute_import, print_function
 import odespy
 import numpy as np
 import nose.tools as nt
@@ -84,8 +84,10 @@ odefun_sympy=0.0000000000000000,
 
 Sine = dict(
     help="Sine, u'' = -u, u = sin(t)",
-    f=lambda (u00,u11),t : [u11, -u00],
-    jac=lambda (u00,u11),t: [[0., 1.], [- 1., 0.]],
+    # f=lambda (u00,u11),t : [u11, -u00],
+    # jac=lambda (u00,u11),t: [[0., 1.], [- 1., 0.]],
+    f=lambda u, t: [u[1], -u[0]],
+    jac=lambda u, t: [[0., 1.], [- 1., 0.]],
     time_points=np.linspace(0., 1, 10),
     # These solvers are not suitable for this ODE problem
     exceptions=['Lsodi', 'Lsodes', 'Lsodis', 'Lsoibt', 'MyRungeKutta',
@@ -142,8 +144,11 @@ odefun_sympy=0.0000000000000000,
 
 VanDerPol = dict(
     help="Van der Pol oscillator problem:  u'' = 3*(1 - u**2)*u' - u",
-    f=lambda (u00,u11),t: [u11, 3.*(1 - u00**2)*u11 - u00],
-    jac=lambda (u00,u11),t: [[0., 1.], [-6.*u00*u11 - 1., 3.*(1. - u00**2)]],
+    # f=lambda (u00,u11),t: [u11, 3.*(1 - u00**2)*u11 - u00],
+    # jac=lambda (u00,u11),t: [[0., 1.], [-6.*u00*u11 - 1., 3.*(1. - u00**2)]],
+    f=lambda u,t: [u[1], 3.*(1 - u[0]**2)*u[1] - u[0]],
+    jac=lambda u,t: [[0., 1.], [-6.*u[0]*u[1] - 1., 3.*(1. - u[0]**2)]],
+
     u0=[2., 0.],
     # These solvers are not suitable for this ODE problem
     exceptions=['RKC', 'Lsodes', 'Leapfrog', 'Lsodi', 'Lsodis', 'Lsoibt',
@@ -244,11 +249,11 @@ def _run_test_problems(problem):
                      'f_kwargs')
     kwargs = {key: problem[key] for key in problem
               if key not in special_names}
-    print problem.get('help', '')
+    print(problem.get('help', ''))
     for method in methods:
 
         solver = eval('odespy.%s' % method)(problem['f'], **kwargs)
-        print 'Testing %s' % method,
+        print('Testing %s' % method)
         solver.set_initial_condition(problem['u0'])
         u, t = solver.solve(problem['time_points'])
 
@@ -277,10 +282,10 @@ def _run_test_problems(problem):
             if method in problem['exact_diff']:
                 nt.assert_almost_equal(diff, problem['exact_diff'][method],
                                        delta=1E-14)
-                print '...ok'
+                print('...ok')
             else:
                 pass
-                print ' no exact diff available for comparison'
+                print(' no exact diff available for comparison')
         if 'exact_final_diff' in problem:
             u_final = np.asarray(u[-1])
             exact_final = np.asarray(problem['exact_final'])
@@ -288,9 +293,9 @@ def _run_test_problems(problem):
             if method in problem['exact_final_diff']:
                 nt.assert_almost_equal(diff, problem['exact_final_diff'][method],
                                        delta=1E-14)
-                print '...ok'
+                print('...ok')
             else:
-                print ' no exact final diff available for comparison'
+                print(' no exact final diff available for comparison')
 
 def test_exponentinal():
     _run_test_problems(Exponential)
@@ -306,7 +311,7 @@ def test_complex():
 
 def test_EulerCromer_1dof():
     """Plain u'' + u = 0."""
-    solver = odespy.EulerCromer(lambda (v, x), t: [-x, v])
+    solver = odespy.EulerCromer(lambda v, t: [-v[1], v[0]])
     #solver = odespy.EulerCromer(lambda u, t: [-u[1], u[0]])
     solver.set_initial_condition([0, 1])
     P = 2*np.pi
@@ -321,7 +326,7 @@ def test_EulerCromer_1dof():
     x_exact = lambda t: np.cos(t)
     x_e = x_exact(t)
     #plot(t, x, t, x_e, legend=('EC', 'exact'))
-    print 'Testing EulerCromer',
+    print('Testing EulerCromer')
     # Test difference in final value
     if N == 60:
         diff_exact = 0.0014700112828
@@ -329,7 +334,7 @@ def test_EulerCromer_1dof():
         tol = 1E-14
         assert abs(diff_exact - diff_EC) < tol, \
                'diff_exact=%g, diff_EulerCromer=%g' % (diff_exact, diff_EC)
-        print '...ok'
+        print('...ok')
 
 def test_terminate():
     problem = Exponential
@@ -338,9 +343,9 @@ def test_terminate():
     u, t = solver.solve(problem['time_points'], terminate=problem['terminate'])
     exact_diff = 0.0321206486802586
     diff = abs(problem['stop_value']-u[-1])
-    print 'Testing RKFehlberg with terminate function',
+    print('Testing RKFehlberg with terminate function')
     nt.assert_almost_equal(diff, exact_diff, delta=1E-14)
-    print '...ok'
+    print('...ok')
 
 def test_switch_to():
     problem = Exponential
@@ -351,9 +356,9 @@ def test_switch_to():
     u2, t2 = solver_new.solve(problem['time_points'])
     diff = np.abs(u - u2).max()
     exact_diff = 0.0000015284633990
-    print 'Testing switch_to from RKFehlberg to Lsode',
+    print('Testing switch_to from RKFehlberg to Lsode')
     nt.assert_almost_equal(diff, exact_diff, delta=1E-14)
-    print '...ok'
+    print('...ok')
 
 
 if __name__ == '__main__':
