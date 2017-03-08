@@ -643,7 +643,7 @@ class Odepack(Solver):
     def initialize(self):
         '''Import extension module _odesolver and check that it exists.'''
         try:
-            import _odepack
+            from . import _odepack
             self._odepack = _odepack
         except ImportError:
             raise ImportError('Cannot find the extension module _odepack.\nRun setup.py again and investigate why _odepack.so was not successfully built.')

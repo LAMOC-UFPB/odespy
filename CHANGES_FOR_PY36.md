@@ -36,6 +36,7 @@ odespy/odepack.py
     Replaced a few "ValueError, msg" to "ValueError(msg)"
     replace all print statements with print function
     mixed tabs and space: 1203, 1232, 1235, 1343, 1456, 1574
+    explicit relative import of _odepack.
 
 odespy/radau5.py
     enable absolute imports , print function
