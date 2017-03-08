@@ -1069,13 +1069,13 @@ class Odepack(Solver):
                                  self.jac_column_f77)
             # call extension module
             nstop, u, istate, rinfo, iinfo = \
-                apply(self._odepack.solve,
-                      (terminate_int, itermin, nstop, f, u,
-                       self.t, self.itol, self.rtol, self.atol,
-                       istate, self.iopt, self.rwork_in, self.lrw,
-                       self.iwork_in, self.liw, jac, jac_column,
-                       self.mf, g, self.ng, solver_name),
-                      self._extra_args_fortran)
+                self._odepack.solve(
+                    *(terminate_int, itermin, nstop, f, u,
+                      self.t, self.itol, self.rtol, self.atol,
+                      istate, self.iopt, self.rwork_in, self.lrw,
+                      self.iwork_in, self.liw, jac, jac_column,
+                      self.mf, g, self.ng, solver_name),
+                    **self._extra_args_fortran)
             tried += 1
             if nstop == step_no:    # successful
                 self.finished = True
@@ -1168,12 +1168,12 @@ class Odepack(Solver):
 
         tried = 0
         while tried < 5:       # prevent endless loop
-            u_new, t, istate, iwork = apply(\
-                eval('self._odepack.d%s' % solver_name),\
-                (res, adda, jac, neq, u[n].copy(), self.ydoti, t, t_next,
-                 self.itol, self.rtol, self.atol, itask, istate, self.iopt,
-                 self.rwork, self.lrw, self.iwork, self.liw, self.mf),
-                self._extra_args_fortran)
+            _fname = 'self._odepack.d%s' % solver_name
+            u_new, t, istate, iwork = _fname(
+                *(res, adda, jac, neq, u[n].copy(), self.ydoti, t, t_next,
+                  self.itol, self.rtol, self.atol, itask, istate, self.iopt,
+                  self.rwork, self.lrw, self.iwork, self.liw, self.mf),
+                **self._extra_args_fortran)
             tried += 1
         # "istate" indicates the returned status
             if istate >= 1:

@@ -37,6 +37,7 @@ odespy/odepack.py
     replace all print statements with print function
     mixed tabs and space: 1203, 1232, 1235, 1343, 1456, 1574
     explicit relative import of _odepack.
+    remove the global apply() function
 
 odespy/radau5.py
     enable absolute imports , print function
