@@ -42,7 +42,7 @@ odespy/odepack.py
 odespy/radau5.py
     enable absolute imports , print function
     print function
-    tab/space: 283
+    mixed tab/space: 283
 
 odespy/problems.py
     enable absolute imports , print function
@@ -50,4 +50,4 @@ odespy/problems.py
 
 odespy/tests/test_basic.py
     enable absolute imports , print function
-    may places (example line 89, 90): the lambda syntax is invalid in PY3.6
+    many places (example line 89, 90): the lambda syntax is invalid in PY3.6
