@@ -1,10 +1,10 @@
 from odespy import *
-from problems import *
+from .problems import *
 from scitools.std import plot, hold
 try:
     import joblib  # need joblib for storing database nested dict
 except ImportError:
-    print 'This script requires joblib to be installed.'
+    print('This script requires joblib to be installed.')
     sys.exit(1)
 
 newresults = {}
@@ -32,20 +32,20 @@ def test_disk():
     tp = np.linspace(0, 10, 1000000)
     # tp = problem.default_parameters()['time_points']
     u, t = solver.solve(tp)
-    print 'made u', u.size
+    print(('made u', u.size))
     u0 = u[:,0]
-    print 'made u0'
+    print('made u0')
     if tp.size > 500000:
         u = u[-100:]
         t = t[-100:]
         error = problem.verify(u, t)
-        print error
+        print(error)
     else:
         error = None
-    print 'u memmap:', u[:10]
+    print(('u memmap:', u[:10]))
     u[:] = 5.5
     u.flush()
-    print u[:10]
+    print((u[:10]))
     return {'Linear2': {'t': t, 'ForwardEuler': (u, error)}}
 
 def test_Exponential():
@@ -63,7 +63,7 @@ def test_VanDerPol(mu=0):
     methods = [Vode, RK4, RungeKutta4, ForwardEuler, BackwardEuler]
     for method in methods:
         name = method.__name__
-        print name
+        print(name)
         solver = method(problem.f, jac=problem.jac,
                         atol=d['atol'], rtol=d['rtol'])
         solver.set_initial_condition(problem.U0)
@@ -72,7 +72,7 @@ def test_VanDerPol(mu=0):
              legend_fancybox=True, legend_loc='upper left')
         hold('on')
         e = problem.verify(u, t)
-        if e is not None: print e
+        if e is not None: print(e)
 
 
 if __name__ == '__main__':

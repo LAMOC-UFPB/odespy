@@ -5,7 +5,7 @@ high-level Python code. Both scalar ODEs and systems of ODEs are
 supported.  A wide range of numerical methods for ODEs are offered:
 
 """
-from __future__ import absolute_import, print_function
+
 
 # Insert tutorial from ../doc/src/odespy/odespy.rst
 
@@ -1265,7 +1265,7 @@ from . import problems
 
 # Update doc strings with common info
 class_, doc_str, classname = None, None, None
-classnames = [name for name, obj in locals().items() \
+classnames = [name for name, obj in list(locals().items()) \
                if inspect.isclass(obj)]
 
 toc = []

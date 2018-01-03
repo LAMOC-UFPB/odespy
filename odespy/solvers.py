@@ -1,5 +1,5 @@
 # Authors: Liwei Wang, Hans Petter Langtangen
-from __future__ import absolute_import, print_function
+
 '''
 This module contains the base class ``Solver``
 package and the implementations of many subclasses.
@@ -329,8 +329,7 @@ _parameters = dict(
 
     specialtimes = dict(
         help='List of special times to use during iteration',
-        type=lambda float_seq: np.asarray(map(lambda x: \
-                     isinstance(x, float),float_seq)).all()),
+        type=lambda float_seq: np.asarray([isinstance(x, float) for x in float_seq]).all()),
 
     ode_method = dict(
         help='solver type: "adams" or "bdf"',
@@ -368,8 +367,7 @@ shape ``neq, ml+mu+1``.""",
     ydoti = dict(
         help='Real array for the initial value of dy/dt.',
         type=(list,tuple,np.ndarray),
-        extra_check=lambda float_seq: np.asarray(map(lambda x: \
-             isinstance(x, float),float_seq)).all(),
+        extra_check=lambda float_seq: np.asarray([isinstance(x, float) for x in float_seq]).all(),
         default = []),
 
     # ja, ia, jc & ic are used to describe the sparse structure
@@ -613,7 +611,7 @@ class Solver:
         # for the class. self._parameters contains all the
         # legal parameters the user of the class can set.
         self._parameters = dict(
-            (key, value.copy()) for key, value in _parameters.items()
+            (key, value.copy()) for key, value in list(_parameters.items())
             if key in self._optional_parameters or \
                key in self._required_parameters
             )
@@ -682,7 +680,7 @@ class Solver:
         except:
             pass
 
-        string_to_compile = '\n'.join(str_funcs.values())
+        string_to_compile = '\n'.join(list(str_funcs.values()))
         if string_to_compile is not '':
             try:
                 # Compile these functions together into module callback
@@ -690,7 +688,7 @@ class Solver:
                 f2py.compile(string_to_compile, modulename='_callback', \
                              verbose=False)
                 import _callback
-                for func in str_funcs.keys():
+                for func in list(str_funcs.keys()):
                     if func == 'f':
                         f = _callback.f
                     else:
@@ -698,7 +696,7 @@ class Solver:
             except:
                 raise ValueError('''
         F2py failed to compile input string (=\n%s)
-        to be callable functions (%s).''' % (string_to_compile, str_funcs.keys()))
+        to be callable functions (%s).''' % (string_to_compile, list(str_funcs.keys())))
         return f, kwargs
 
     def adjust_parameters(self):
@@ -882,10 +880,10 @@ class Solver:
             # user's functions. Instead, insert an entries that
             # reflect the name of user-supplied functions
             del all_args['f']
-            all_args['name of f'] = self.users_f.func_name
+            all_args['name of f'] = self.users_f.__name__
             if 'jac' in all_args:
                 del all_args['jac']
-                all_args['name of jac'] = self.users_jac.func_name
+                all_args['name of jac'] = self.users_jac.__name__
 
             if print_info:
                 print(pprint.pformat(all_args))
@@ -1380,7 +1378,7 @@ class MySolver(Solver):
         u,t = method.solve(time_points)
     """
     _required_parameters = ['f', 'myadvance']
-    _optional_parameters = _parameters.keys()
+    _optional_parameters = list(_parameters.keys())
     # All arguments are valid and accessible for users.
 
     def advance(self):
@@ -2648,7 +2646,7 @@ class RKFehlberg(Adaptive):
             # Factor to adjust next step size
             s = (tol/(2*error))**0.25
             # Factor should be in a reasonable range[0.1,4.0]
-            s = min(map(middle, s)) if self.neq > 1 else middle(s)
+            s = min(list(map(middle, s))) if self.neq > 1 else middle(s)
 
             # Step size should be in range [min_step, max_step]
             h = middle(h*s, self.min_step, self.max_step)

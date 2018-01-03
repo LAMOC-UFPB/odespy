@@ -1,5 +1,5 @@
 """Module for wrapping rkf45.py."""
-from __future__ import absolute_import, print_function
+
 from . solvers import Solver, Adaptive
 import numpy as np
 
@@ -64,7 +64,7 @@ class RKF45(Adaptive):
     def initialize(self):
         '''Import extension module _rkf45 and check that it exists.'''
         try:
-            import _rkf45
+            from . import _rkf45
             self._rkf45 = _rkf45
         except ImportError:
             raise ImportError('Cannot find the extension module _rkf45.\nRun setup.py again and investigate why _rkf45.so was not successfully built.')

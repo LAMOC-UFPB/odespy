@@ -1,3 +1,5 @@
+*.bak
+*.so
 build/
 *.pyc
 .tox

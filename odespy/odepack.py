@@ -1,4 +1,4 @@
-from __future__ import absolute_import, print_function
+
 from . solvers import Solver
 import numpy as np
 import sys, inspect
@@ -404,7 +404,7 @@ used to describe the structure of matrix A.''',
         type=(list, tuple, np.ndarray),
         # integer sequence
         extra_check=lambda int_seq: \
-            np.array(map(lambda x: isinstance(x, int),int_seq)).all()),
+            np.array([isinstance(x, int) for x in int_seq]).all()),
 
     ia = dict(
         help='''Integer array with length neq+1 which contains
@@ -419,7 +419,7 @@ k < ia(j+1).''',
         type=(list, tuple, np.ndarray),
         # integer sequence
         extra_check=lambda int_seq: \
-             np.array(map(lambda x: isinstance(x, int),int_seq)).all()),
+             np.array([isinstance(x, int) for x in int_seq]).all()),
 
     jc = dict(
         help='''Integer array which describes the sparsity
@@ -430,14 +430,14 @@ the sparse structure of Jacobian matrix.''',
         type=(list, tuple, np.ndarray),
         # integer sequence
         extra_check=lambda int_seq: \
-            np.array(map(lambda x: isinstance(x, int),int_seq)).all()),
+            np.array([isinstance(x, int) for x in int_seq]).all()),
 
     ic = dict(
         help='Array which contains starting locations in jc.',
         type=(list, tuple, np.ndarray),
         # integer sequence
         extra_check=lambda int_seq: \
-            np.array(map(lambda x: isinstance(x, int),int_seq)).all()),
+            np.array([isinstance(x, int) for x in int_seq]).all()),
 
     # mb, nb describe the block-tridiagonal form of matrix.
     mb = dict(
@@ -1243,7 +1243,7 @@ class Lsode(Odepack):
         self._parameters['jac_banded_f77']['paralist_new'] = 'u,t,ml,mu'
         self._parameters['jac_banded_f77']['name_wrapped'] = 'jac_banded'
 
-        self._parameters['corrector_iter_method']['range'] = range(6)
+        self._parameters['corrector_iter_method']['range'] = list(range(6))
         self._parameters['corrector_iter_method']['condition-list'] = \
                 {'1':[('jac','jac_f77'),],\
                  '4':['ml','mu',('jac_banded','jac_banded_f77')],\
@@ -1583,7 +1583,7 @@ class Lsodes(Odepack):
         self._parameters['jac_column_f77']['paralist_new'] = 'u,t,j'
         self._parameters['jac_column_f77']['name_wrapped'] = 'jac_column'
 
-        self._parameters['moss']['range'] = range(4)
+        self._parameters['moss']['range'] = list(range(4))
         self._parameters['moss']['condition-list'] = \
                         {1: [('jac_column', 'jac_column_f77'),], \
                          0: ['ia', 'ja']}
@@ -1884,7 +1884,7 @@ Choice for the corrector iteration method:
      (difference quotient) sparse Jacobian matrix.
      This uses extra calls to "res" per dr/du
      evaluation. (Default)""",
-        self._parameters['moss']['range'] = range(5)
+        self._parameters['moss']['range'] = list(range(5))
         self._parameters['moss']['condition-list'] = \
                          {'1':['jac_lsodis',],
                           '0':['ia','ja','ic','jc'],
