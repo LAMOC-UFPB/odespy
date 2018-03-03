@@ -3,7 +3,7 @@ package:
     version: "0.3.0"
 
 source:
-    git_url: https://github.com/hplgit/odespy
+    git_url: https://github.com/thomasantony/odespy
 
 requirements:
     build:
@@ -16,7 +16,7 @@ requirements:
         - numpy
 
 about:
-    home: https://github.com/hplgit/odespy
+    home: https://github.com/thomasantony/odespy
     summary: Odespy (ODE Software in Python) offers a unified interface to a large collection of software for solving systems of ordinary differential equations (ODEs). There is also some support for Differential Algebraic Equations (DAEs).'
 
 build:
