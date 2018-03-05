@@ -1044,8 +1044,9 @@ class Solver:
                 print('%s, step %d, t=%g' %
                       (self.__class__.__name__, n+1, self.t[n+1]))
             if terminate(self.u, self.t, n+1):
-                print(self.__class__.__name__,
-                      'terminated at t=%g' % self.t[n+1])
+                if self.verbose > 2:
+                    print(self.__class__.__name__,
+                          'terminated at t=%g' % self.t[n+1])
                 if not self.disk_storage:
                     self.u, self.t = self.u[:n+2], self.t[:n+2]
                 # else: must keep original size of file, rest is 0
